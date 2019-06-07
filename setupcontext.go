@@ -2,6 +2,7 @@ package treetest
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -27,6 +28,18 @@ func (tc *SetupContext) MustFindFile(fileName string) File {
 func (tc *SetupContext) RegisterItem(name string, item interface{}) *SetupContext {
 	tc.TestCase.registeredItems[name] = item
 	return tc
+}
+
+func (tc *SetupContext) MustGetItem(name string) interface{} {
+	item, ok := tc.TestCase.registeredItems[name]
+	if !ok {
+		var items []string
+		for name := range tc.TestCase.registeredItems {
+			items = append(items, name)
+		}
+		panic(fmt.Sprintf("trying to get '%s' but it isn't registered. Available items: %s", name, strings.Join(items, ", ")))
+	}
+	return item
 }
 
 func (tc *SetupContext) Teardown(teardown func(ctx TeardownContext)) *SetupContext {

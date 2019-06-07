@@ -1,6 +1,8 @@
 package treetest
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 	"testing"
 )
@@ -26,4 +28,16 @@ func (ctx *TestRunnerContext) GetWaitGroup() *sync.WaitGroup {
 func (ctx *TestRunnerContext) RegisterItem(name string, item interface{}) *TestRunnerContext {
 	ctx.spec.registeredItems[name] = item
 	return ctx
+}
+
+func (tc *TestRunnerContext) MustGetItem(name string) interface{} {
+	item, ok := tc.spec.registeredItems[name]
+	if !ok {
+		var items []string
+		for name := range tc.spec.registeredItems {
+			items = append(items, name)
+		}
+		panic(fmt.Sprintf("trying to get '%s' but it isn't registered. Available items: %s", name, strings.Join(items, ", ")))
+	}
+	return item
 }
