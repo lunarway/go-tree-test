@@ -7,12 +7,6 @@ import (
 	"testing"
 )
 
-type TestRunnerContext struct {
-	T *testing.T
-	WG *sync.WaitGroup
-	Spec SpecTest
-}
-
 type TestRunner func(context TestRunnerContext, run func(TestRunnerContext))
 type TestSetup func(SetupContext)
 type Test interface {
@@ -108,9 +102,11 @@ func (b *testingDefinitionBuilder) RunTestsIn(t *testing.T, path string) {
 			spec := allSpecs[ts]
 			if onlyRun == "" || strings.HasPrefix(spec.GetName(), onlyRun) {
 				runner(TestRunnerContext{
-					t, wg, spec,
+					t:    t,
+					wg:   wg,
+					spec: spec.(*TestCase), // TODO fix this possibly bad type cast
 				}, func(context TestRunnerContext) {
-					context.Spec.Run(context.T, context.WG)
+					context.GetSpec().Run(context.GetT(), context.GetWaitGroup())
 				})
 			}
 			wg.Wait()
@@ -122,9 +118,11 @@ func (b *testingDefinitionBuilder) RunTestsIn(t *testing.T, path string) {
 
 			if onlyRun == "" || strings.HasPrefix(spec.GetName(), onlyRun) {
 				runner(TestRunnerContext{
-					t, wg, spec,
+					t:    t,
+					wg:   wg,
+					spec: spec.(*TestCase), // TODO fix this possibly bad type cast
 				}, func(context TestRunnerContext) {
-					context.Spec.Run(context.T, context.WG)
+					context.GetSpec().Run(context.GetT(), context.GetWaitGroup())
 				})
 			}
 		}

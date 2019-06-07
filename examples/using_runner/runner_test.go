@@ -11,7 +11,7 @@ func TestSetup(t *testing.T) {
 	treetest.DefineTesting().
 		UsingRunner(func(context treetest.TestRunnerContext, run func(treetest.TestRunnerContext)) {
 			start := time.Now()
-			defer fmt.Println(context.Spec.GetName() + " done in " + (time.Now().Sub(start).String()))
+			defer fmt.Println(context.GetSpec().GetName() + " done in " + (time.Now().Sub(start).String()))
 			run(context);
 		}).
 		Setup(func(context treetest.SetupContext) {
